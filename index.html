@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>นักออกแบบน้อย แก้ปัญหาเก่ง (ป.1) - วิทยาการคำนวณ</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Kanit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti for Celebration -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        * {
+            font-family: 'Kanit', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        /* Custom Bounce & Pop-in Keyframes */
+        @keyframes gentleBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.92); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(251, 191, 36, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.85); }
+        }
+
+        .animate-bounce-gentle {
+            animation: gentleBounce 2.5s ease-in-out infinite;
+        }
+
+        .animate-pop-in {
+            animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .animate-wiggle {
+            animation: wiggle 0.6s ease-in-out;
+        }
+
+        .pulse-gold {
+            animation: pulseGlow 2s infinite;
+        }
+
+        /* Custom scrollbar for small containers */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+
+        /* Certificate border decorative pattern */
+        .cert-border {
+            border: 12px double #f59e0b;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-sky-100 via-indigo-50 to-amber-50 min-h-screen text-slate-800 flex flex-col justify-between overflow-x-hidden">
+
+    <!-- Header / Status Bar -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b-4 border-sky-300 shadow-md px-4 py-3 sm:px-6">
+        <div class="max-w-4xl mx-auto flex items-center justify-between">
+            <!-- App Logo & Home Trigger -->
+            <button onclick="navTo('home')" class="flex items-center gap-2 group text-left transition transform active:scale-95">
+                <span class="text-3xl sm:text-4xl animate-bounce-gentle inline-block">🤖</span>
+                <div>
+                    <h1 class="font-extrabold text-base sm:text-xl text-sky-700 leading-tight group-hover:text-sky-800">
+                        นักออกแบบน้อย แก้ปัญหาเก่ง
+                    </h1>
+                    <span class="text-xs bg-amber-200 text-amber-900 font-bold px-2 py-0.5 rounded-full inline-block">
+                        ป.1 วิทยาการคำนวณ
+                    </span>
+                </div>
+            </button>
+
+            <!-- Star Count & Sound Controls -->
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1.5 bg-amber-100 border-2 border-amber-300 px-3 py-1.5 rounded-full shadow-inner font-extrabold text-amber-800 text-sm sm:text-base">
+                    <span class="text-xl">⭐</span>
+                    <span id="starCounter">0</span>
+                </div>
+                <button id="soundToggleBtn" onclick="toggleAudio()" aria-label="เปิดปิดเสียง" class="w-10 h-10 rounded-full bg-sky-200 hover:bg-sky-300 text-sky-800 flex items-center justify-center text-lg shadow active:scale-90 transition">
+                    <i id="soundIcon" class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto w-full p-4 sm:p-6 flex-grow flex flex-col justify-center">
+
+        <!-- Custom Notification Toast -->
+        <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 transform -translate-y-10 opacity-0 pointer-events-none transition-all duration-300 bg-slate-900/90 text-white font-bold px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-base">
+            <span id="toastIcon" class="text-2xl">💡</span>
+            <span id="toastMessage">ข้อความแจ้งเตือน</span>
+        </div>
+
+        <!-- SCREEN: HOME -->
+        <section id="screen-home" class="screen-view animate-pop-in space-y-6">
+            <!-- Hero Banner -->
+            <div class="bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-500 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden text-center">
+                <div class="absolute -right-8 -bottom-8 opacity-20 text-9xl">🧩</div>
+                <span class="inline-block bg-white/20 backdrop-blur-sm px-4 py-1 rounded-full text-xs sm:text-sm font-semibold mb-3 border border-white/30">
+                    📘 วิทยาการคำนวณ & เทคโนโลยี ป.1
+                </span>
+                <h2 class="text-2xl sm:text-4xl font-extrabold drop-shadow mb-2">
+                    มาเรียนรู้วิธี "แก้ปัญหา" อย่างฉลาดกันเถอะ!
+                </h2>
+                <p class="text-sky-100 text-sm sm:text-lg max-w-xl mx-auto font-light">
+                    ฝึกคิดเป็นขั้นเป็นตอน สนุกกับภารกิจสุดท้าทาย และสะสมดาวรับเกียรติบัตรสุดเท่! 🌟
+                </p>
+
+                <!-- Primary Action Hub -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6 max-w-lg mx-auto">
+                    <button onclick="startLessons()" class="bg-amber-400 hover:bg-amber-300 text-amber-950 font-black py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transition transform active:scale-95 text-lg flex items-center justify-center gap-3 border-b-4 border-amber-600">
+                        <span class="text-2xl">📖</span>
+                        <span>เรียนรู้บทเรียน (3 ขั้น)</span>
+                    </button>
+                    <button onclick="startGamesHub()" class="bg-emerald-400 hover:bg-emerald-300 text-emerald-950 font-black py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transition transform active:scale-95 text-lg flex items-center justify-center gap-3 border-b-4 border-emerald-600">
+                        <span class="text-2xl">🎮</span>
+                        <span>ตะลุยเกมฝึกทักษะ (4 ด่าน)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3 Core Concepts Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white p-5 rounded-2xl shadow-md border-2 border-rose-200 hover:border-rose-400 transition transform hover:-translate-y-1">
+                    <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-2xl font-bold mb-3">
+                        🔍
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-1">1. มองหาปัญหา</h3>
+                    <p class="text-slate-600 text-sm">สังเกตว่าเกิดอะไรขึ้น อะไรทำให้เราติดขัดหรือไม่สะดวกสบาย</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-md border-2 border-amber-200 hover:border-amber-400 transition transform hover:-translate-y-1">
+                    <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-2xl font-bold mb-3">
+                        📝
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-1">2. วางแผนแก้ปัญหา</h3>
+                    <p class="text-slate-600 text-sm">คิดหาวิธีแก้ เลือกเครื่องมือ หรือเรียงลำดับสิ่งที่ต้องทำก่อนหลัง</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl shadow-md border-2 border-emerald-200 hover:border-emerald-400 transition transform hover:-translate-y-1">
+                    <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center text-2xl font-bold mb-3">
+                        ✅
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-1">3. ตรวจทานผลลัพธ์</h3>
+                    <p class="text-slate-600 text-sm">ลงมือทำจริง แล้วตรวจสอบดูซิว่าปัญหาคลี่คลายเรียบร้อยดีไหม</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN: LESSONS -->
+        <section id="screen-lessons" class="screen-view hidden animate-pop-in space-y-6">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border-4 border-sky-200 relative">
+                <!-- Lesson Navigation Bar -->
+                <div class="flex items-center justify-between border-b pb-4 mb-6">
+                    <button onclick="navTo('home')" class="text-slate-500 hover:text-slate-800 text-sm font-semibold flex items-center gap-1 active:scale-90 transition">
+                        <i class="fa-solid fa-arrow-left"></i> หน้าหลัก
+                    </button>
+                    <div class="flex gap-2">
+                        <span id="lessonDot0" class="w-3 h-3 rounded-full bg-sky-500 transition"></span>
+                        <span id="lessonDot1" class="w-3 h-3 rounded-full bg-slate-200 transition"></span>
+                        <span id="lessonDot2" class="w-3 h-3 rounded-full bg-slate-200 transition"></span>
+                    </div>
+                    <span id="lessonIndexBadge" class="text-xs bg-sky-100 text-sky-800 font-bold px-3 py-1 rounded-full">
+                        บทที่ 1 / 3
+                    </span>
+                </div>
+
+                <!-- Dynamic Lesson Content -->
+                <div id="lessonContentContainer" class="min-h-[320px] flex flex-col justify-center">
+                    <!-- Injected by JavaScript -->
+                </div>
+
+                <!-- Footer Navigation Buttons -->
+                <div class="flex items-center justify-between pt-6 border-t mt-6">
+                    <button id="lessonPrevBtn" onclick="prevLesson()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-5 py-2.5 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed transition active:scale-95 flex items-center gap-2">
+                        <i class="fa-solid fa-chevron-left"></i> ก่อนหน้า
+                    </button>
+                    <button id="lessonNextBtn" onclick="nextLesson()" class="bg-sky-500 hover:bg-sky-600 text-white font-bold px-6 py-2.5 rounded-xl shadow-md hover:shadow transition active:scale-95 flex items-center gap-2">
+                        <span>ถัดไป</span> <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN: GAMES HUB -->
+        <section id="screen-games-hub" class="screen-view hidden animate-pop-in space-y-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800">🎮 ตะลุยภารกิจฝึกทักษะ</h2>
+                    <p class="text-slate-600 text-sm">ผ่านให้ครบ 4 ด่านเพื่อคว้าดาวและรับเกียรติบัตร!</p>
+                </div>
+                <button onclick="navTo('home')" class="bg-white border-2 border-slate-200 hover:bg-slate-100 text-slate-700 px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition active:scale-95">
+                    🏠 กลับหน้าหลัก
+                </button>
+            </div>
+
+            <!-- Game Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Level 1 Card -->
+                <button onclick="startLevel(1)" class="group bg-white p-5 rounded-3xl shadow-md border-3 border-amber-200 hover:border-amber-400 text-left transition transform hover:-translate-y-1 active:scale-98 flex items-start gap-4">
+                    <div class="text-4xl bg-amber-100 p-3 rounded-2xl group-hover:scale-110 transition">
+                        🔍
+                    </div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">ด่านที่ 1</span>
+                            <span id="lvl1Badge" class="text-xs text-slate-400 font-bold">ยังไม่ผ่าน</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800 mt-1">ค้นหาปัญหาให้เจอ</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">สังเกตสถานการณ์แล้วชี้จุดที่เป็นอุปสรรค</p>
+                    </div>
+                </button>
+
+                <!-- Level 2 Card -->
+                <button onclick="startLevel(2)" class="group bg-white p-5 rounded-3xl shadow-md border-3 border-blue-200 hover:border-blue-400 text-left transition transform hover:-translate-y-1 active:scale-98 flex items-start gap-4">
+                    <div class="text-4xl bg-blue-100 p-3 rounded-2xl group-hover:scale-110 transition">
+                        🔢
+                    </div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full">ด่านที่ 2</span>
+                            <span id="lvl2Badge" class="text-xs text-slate-400 font-bold">ยังไม่ผ่าน</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800 mt-1">เรียงลำดับขั้นตอน</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">ฝึกอัลกอริทึม เรียงลำดับ 1-2-3 ให้ถูกต้อง</p>
+                    </div>
+                </button>
+
+                <!-- Level 3 Card -->
+                <button onclick="startLevel(3)" class="group bg-white p-5 rounded-3xl shadow-md border-3 border-emerald-200 hover:border-emerald-400 text-left transition transform hover:-translate-y-1 active:scale-98 flex items-start gap-4">
+                    <div class="text-4xl bg-emerald-100 p-3 rounded-2xl group-hover:scale-110 transition">
+                        🛠️
+                    </div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">ด่านที่ 3</span>
+                            <span id="lvl3Badge" class="text-xs text-slate-400 font-bold">ยังไม่ผ่าน</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800 mt-1">เลือกเครื่องมือแก้ปัญหา</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">จับคู่อุปกรณ์ที่เหมาะสมกับปัญหาตรงหน้า</p>
+                    </div>
+                </button>
+
+                <!-- Level 4 Card -->
+                <button onclick="startLevel(4)" class="group bg-white p-5 rounded-3xl shadow-md border-3 border-purple-200 hover:border-purple-400 text-left transition transform hover:-translate-y-1 active:scale-98 flex items-start gap-4">
+                    <div class="text-4xl bg-purple-100 p-3 rounded-2xl group-hover:scale-110 transition">
+                        🤖
+                    </div>
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-full">ด่านที่ 4</span>
+                            <span id="lvl4Badge" class="text-xs text-slate-400 font-bold">ยังไม่ผ่าน</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800 mt-1">พาหุ่นยนต์ไปเก็บขยะ</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">เขียนโปรแกรมด้วยลูกศรนำหุ่นยนต์ทิ้งขยะ</p>
+                    </div>
+                </button>
+            </div>
+        </section>
+
+        <!-- SCREEN: LEVEL 1 (Spot Problem) -->
+        <section id="screen-game-1" class="screen-view hidden animate-pop-in space-y-4">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border-4 border-amber-300">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-xs font-bold bg-amber-100 text-amber-800 px-3 py-1 rounded-full">
+                        ด่านที่ 1: ค้นหาปัญหา 🔍 (ข้อ <span id="l1QuestionNum">1</span>/3)
+                    </span>
+                    <button onclick="navTo('games-hub')" class="text-slate-400 hover:text-slate-600 font-bold text-sm">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- Problem Scenario Box -->
+                <div class="bg-amber-50 border-2 border-amber-200 rounded-2xl p-5 text-center my-4">
+                    <div id="l1ScenarioEmoji" class="text-6xl sm:text-7xl mb-2 animate-bounce-gentle">🌧️🎒</div>
+                    <h3 id="l1ScenarioTitle" class="text-xl sm:text-2xl font-extrabold text-slate-800">
+                        น้องส้มกำลังจะเดินกลับบ้าน แต่ฝนตกลงมาอย่างหนัก!
+                    </h3>
+                    <p class="text-slate-500 text-sm mt-1">เด็กๆ ลองคิดดูซิว่า... ข้อใดคือ "ปัญหา" ของน้องส้ม?</p>
+                </div>
+
+                <!-- 3 Options -->
+                <div id="l1OptionsContainer" class="grid grid-cols-1 gap-3 mt-4">
+                    <!-- Dynamically rendered -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN: LEVEL 2 (Step Sequencing) -->
+        <section id="screen-game-2" class="screen-view hidden animate-pop-in space-y-4">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border-4 border-blue-300">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-xs font-bold bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+                        ด่านที่ 2: เรียงลำดับขั้นตอน 🔢
+                    </span>
+                    <button onclick="navTo('games-hub')" class="text-slate-400 hover:text-slate-600 font-bold text-sm">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <div class="text-center mb-4">
+                    <h3 id="l2Title" class="text-xl sm:text-2xl font-extrabold text-slate-800">
+                        ภารกิจ: เรียงลำดับขั้นตอน "การแปรงฟัน" 🪥
+                    </h3>
+                    <p class="text-slate-500 text-sm">กดเลือกขั้นตอนด้านล่างเรียงตามลำดับ 1 ➔ 2 ➔ 3 ให้ถูกต้อง</p>
+                </div>
+
+                <!-- Sequencing Target Slots -->
+                <div class="grid grid-cols-3 gap-2 sm:gap-4 my-6">
+                    <div id="slot1" class="border-3 border-dashed border-sky-300 bg-sky-50 rounded-2xl p-3 sm:p-4 text-center min-h-[110px] flex flex-col justify-center items-center">
+                        <span class="text-xs text-sky-600 font-bold bg-white px-2 py-0.5 rounded-full mb-1">ขั้นที่ 1</span>
+                        <div class="slot-content text-sm sm:text-base font-bold text-slate-700">ว่าง</div>
+                    </div>
+                    <div id="slot2" class="border-3 border-dashed border-sky-300 bg-sky-50 rounded-2xl p-3 sm:p-4 text-center min-h-[110px] flex flex-col justify-center items-center">
+                        <span class="text-xs text-sky-600 font-bold bg-white px-2 py-0.5 rounded-full mb-1">ขั้นที่ 2</span>
+                        <div class="slot-content text-sm sm:text-base font-bold text-slate-700">ว่าง</div>
+                    </div>
+                    <div id="slot3" class="border-3 border-dashed border-sky-300 bg-sky-50 rounded-2xl p-3 sm:p-4 text-center min-h-[110px] flex flex-col justify-center items-center">
+                        <span class="text-xs text-sky-600 font-bold bg-white px-2 py-0.5 rounded-full mb-1">ขั้นที่ 3</span>
+                        <div class="slot-content text-sm sm:text-base font-bold text-slate-700">ว่าง</div>
+                    </div>
+                </div>
+
+                <!-- Available Steps to Pick -->
+                <div class="space-y-2">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider text-center">เลือกขั้นตอนด้านล่าง:</p>
+                    <div id="l2OptionsList" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <!-- Options generated dynamically -->
+                    </div>
+                </div>
+
+                <div class="text-center pt-4">
+                    <button onclick="resetL2()" class="text-xs text-rose-500 font-bold hover:underline">
+                        <i class="fa-solid fa-arrow-rotate-left"></i> ลองจัดลำดับใหม่
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN: LEVEL 3 (Tool Selection) -->
+        <section id="screen-game-3" class="screen-view hidden animate-pop-in space-y-4">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border-4 border-emerald-300">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-xs font-bold bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full">
+                        ด่านที่ 3: เลือกเครื่องมือแก้ปัญหา 🛠️ (ข้อ <span id="l3QuestionNum">1</span>/3)
+                    </span>
+                    <button onclick="navTo('games-hub')" class="text-slate-400 hover:text-slate-600 font-bold text-sm">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <div class="bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-5 text-center my-3">
+                    <div id="l3ScenarioEmoji" class="text-6xl sm:text-7xl mb-2 animate-bounce-gentle">🥤💧</div>
+                    <h3 id="l3ScenarioTitle" class="text-xl sm:text-2xl font-extrabold text-slate-800">
+                        มีน้ำหวานหกเลอะเทอะเต็มพื้นห้อง!
+                    </h3>
+                    <p class="text-slate-500 text-sm mt-1">เราควรเลือกใช้เครื่องมือใดแก้ปัญหานี้ให้พื้นแห้งสะอาด?</p>
+                </div>
+
+                <div id="l3OptionsContainer" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
+                    <!-- Tool options injected via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN: LEVEL 4 (Robot Coding Grid) -->
+        <section id="screen-game-4" class="screen-view hidden animate-pop-in space-y-4">
+            <div class="bg-white rounded-3xl p-5 sm:p-7 shadow-xl border-4 border-purple-300">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-xs font-bold bg-purple-100 text-purple-800 px-3 py-1 rounded-full">
+                        ด่านที่ 4: พาหุ่นยนต์ไปแก้ปัญหา 🤖
+                    </span>
+                    <button onclick="navTo('games-hub')" class="text-slate-400 hover:text-slate-600 font-bold text-sm">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- Grid Visual and Command Stack Side by Side / Stacked -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                    
+                    <!-- 3x3 Grid Map (7 cols on md) -->
+                    <div class="md:col-span-7 flex flex-col items-center">
+                        <div class="bg-purple-50 p-3 sm:p-4 rounded-3xl border-3 border-purple-200 shadow-inner inline-block">
+                            <div id="robotGrid" class="grid grid-cols-3 gap-2 w-64 h-64 sm:w-72 sm:h-72">
+                                <!-- 9 cells generated dynamically -->
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 text-xs font-bold text-slate-500 mt-2">
+                            <span class="flex items-center gap-1">🤖 หุ่นยนต์</span>
+                            <span class="flex items-center gap-1">🧃 กล่องนมเปรี้ยว</span>
+                            <span class="flex items-center gap-1">🗑️ ถังขยะ</span>
+                        </div>
+                    </div>
+
+                    <!-- Command Stack & Controller (5 cols on md) -->
+                    <div class="md:col-span-5 flex flex-col justify-between space-y-4">
+                        <!-- Command List Display (Max 4-5 steps) -->
+                        <div class="bg-slate-100 rounded-2xl p-3 border-2 border-slate-200">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-bold text-slate-600 uppercase">ลำดับคำสั่งที่เลือก:</span>
+                                <button onclick="clearRobotCommands()" class="text-xs text-rose-500 hover:text-rose-700 font-bold flex items-center gap-1">
+                                    <i class="fa-solid fa-trash-can"></i> ลบคำสั่ง
+                                </button>
+                            </div>
+                            <div id="commandStackContainer" class="flex gap-2 min-h-[48px] items-center justify-start overflow-x-auto p-1 bg-white rounded-xl border border-slate-300">
+                                <span class="text-xs text-slate-400 italic px-2">ยังไม่มีคำสั่ง (กดปุ่มลูกศรด้านล่าง)</span>
+                            </div>
+                        </div>
+
+                        <!-- Arrow Direction Controls -->
+                        <div class="grid grid-cols-3 gap-2 max-w-[220px] mx-auto">
+                            <div></div>
+                            <button onclick="addRobotCommand('UP')" class="bg-sky-400 hover:bg-sky-500 text-white font-bold p-3 rounded-2xl shadow active:scale-90 text-2xl transition">
+                                ⬆️
+                            </button>
+                            <div></div>
+                            <button onclick="addRobotCommand('LEFT')" class="bg-sky-400 hover:bg-sky-500 text-white font-bold p-3 rounded-2xl shadow active:scale-90 text-2xl transition">
+                                ⬅️
+                            </button>
+                            <button onclick="addRobotCommand('DOWN')" class="bg-sky-400 hover:bg-sky-500 text-white font-bold p-3 rounded-2xl shadow active:scale-90 text-2xl transition">
+                                ⬇️
+                            </button>
+                            <button onclick="addRobotCommand('RIGHT')" class="bg-sky-400 hover:bg-sky-500 text-white font-bold p-3 rounded-2xl shadow active:scale-90 text-2xl transition">
+                                ➡️
+                            </button>
+                        </div>
+
+                        <!-- Run Algorithm Button -->
+                        <button id="runRobotBtn" onclick="runRobotProgram()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black py-3.5 px-4 rounded-2xl shadow-lg active:scale-95 transition flex items-center justify-center gap-2 text-lg border-b-4 border-emerald-700">
+                            <span>🚀 เล่นคำสั่งตามที่วางแผน!</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN: SUMMARY & CERTIFICATE -->
+        <section id="screen-summary" class="screen-view hidden animate-pop-in space-y-6">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border-4 border-amber-300 text-center max-w-xl mx-auto">
+                <div class="text-6xl sm:text-7xl animate-bounce-gentle">🏆</div>
+                <h2 class="text-2xl sm:text-3xl font-black text-slate-800 mt-2">
+                    ยินดีด้วย! คุณคือนักแก้ปัญหาตัวจริง!
+                </h2>
+                <p class="text-slate-600 text-sm mt-1">
+                    เก่งมากๆ เลยนะ สามารถเรียนรู้และแก้ปัญหาได้ตามขั้นตอนจนสำเร็จครบถ้วน
+                </p>
+
+                <!-- Stars Badge -->
+                <div class="inline-flex items-center gap-2 bg-amber-100 border-2 border-amber-400 px-5 py-2 rounded-full my-4 shadow-inner">
+                    <span class="text-3xl">⭐</span>
+                    <span class="text-2xl font-black text-amber-900" id="summaryStarCount">0</span>
+                    <span class="text-amber-800 font-bold">ดวง</span>
+                </div>
+
+                <!-- Certificate Name Input Form -->
+                <div id="certInputBox" class="bg-sky-50 border-2 border-sky-200 rounded-2xl p-4 sm:p-6 text-left my-4">
+                    <label for="studentNameInput" class="block text-sm font-bold text-sky-900 mb-2">
+                        ✍️ พิมพ์ชื่อ-นามสกุล ของนักเรียนเพื่อรับเกียรติบัตร:
+                    </label>
+                    <input type="text" id="studentNameInput" placeholder="เช่น เด็กชาย ปัญญา รักการเรียน" class="w-full px-4 py-3 rounded-xl border-2 border-sky-300 focus:outline-none focus:ring-4 focus:ring-sky-200 font-medium text-slate-800 text-base bg-white">
+                    <button onclick="generateCertificate()" class="w-full mt-3 bg-amber-400 hover:bg-amber-300 text-amber-950 font-black py-3 rounded-xl shadow-md active:scale-95 transition text-base flex items-center justify-center gap-2 border-b-4 border-amber-600">
+                        <i class="fa-solid fa-award"></i> สร้างเกียรติบัตรของฉัน!
+                    </button>
+                </div>
+
+                <!-- Printable Certificate Card -->
+                <div id="certificateCard" class="hidden text-left bg-gradient-to-br from-amber-50 via-white to-sky-50 p-6 sm:p-8 rounded-3xl shadow-2xl cert-border relative overflow-hidden my-6">
+                    <div class="text-center space-y-2">
+                        <div class="text-4xl">🎓</div>
+                        <h4 class="text-xs uppercase font-extrabold tracking-widest text-amber-700">เกียรติบัตรรับรองความสามารถ</h4>
+                        <h3 class="text-2xl font-extrabold text-slate-800">นักออกแบบน้อย แก้ปัญหาเก่ง (ป.1)</h3>
+                        <p class="text-xs text-slate-500">กลุ่มสาระการเรียนรู้วิทยาศาสตร์และเทคโนโลยี (วิทยาการคำนวณ)</p>
+                        
+                        <div class="py-4 my-2 border-y border-amber-200">
+                            <span class="text-xs text-slate-400">ขอมอบเกียรติบัตรฉบับนี้ให้ไว้แก่</span>
+                            <div id="certStudentName" class="text-2xl sm:text-3xl font-extrabold text-sky-800 underline decoration-sky-300 underline-offset-8 mt-1">
+                                เด็กชาย สมาร์ท คิดสร้างสรรค์
+                            </div>
+                        </div>
+
+                        <p class="text-xs sm:text-sm text-slate-600 font-medium px-4">
+                            ได้ผ่านการฝึกฝนทักษะการมองหาปัญหา การวางแผนด้วยอัลกอริทึมอย่างเป็นขั้นตอน และการเลือกใช้เครื่องมือแก้ปัญหาได้อย่างยอดเยี่ยม
+                        </p>
+
+                        <div class="flex justify-between items-end pt-4 mt-2 text-xs text-slate-500 border-t border-dashed border-amber-200">
+                            <div>
+                                <span class="font-bold text-amber-800">ระดับ:</span> ประถมศึกษาปีที่ 1
+                            </div>
+                            <div class="text-right">
+                                <span class="text-2xl">🌟🌟🌟🌟🌟</span>
+                                <div class="font-bold text-slate-700 mt-0.5">ครูผู้สอนวิทยาการคำนวณ</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Controls -->
+                <div class="flex flex-col sm:flex-row gap-3 justify-center mt-6">
+                    <button id="printCertBtn" onclick="printCertificate()" class="hidden bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 px-6 rounded-2xl shadow active:scale-95 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-print"></i> พิมพ์ / บันทึกเกียรติบัตร
+                    </button>
+                    <button onclick="resetWholeApp()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-6 rounded-2xl shadow active:scale-95 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> เล่นใหม่อีกครั้ง
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-4 text-center text-xs text-slate-500 border-t border-slate-200 bg-white/60">
+        <p>สื่อการเรียนรู้อินเทอร์แอคทีฟ วิชาวิทยาการคำนวณ ชั้นประถมศึกษาปีที่ 1 • ออกแบบตามหลักสูตรแกนกลางฯ</p>
+    </footer>
+
+    <script>
+        // Web Audio API Synthesizer Context
+        let audioCtx = null;
+        let isAudioMuted = false;
+
+        function getAudioContext() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        function playSound(type) {
+            if (isAudioMuted) return;
+            try {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+
+                if (type === 'click') {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                } else if (type === 'correct') {
+                    // Cheerful rising major arpeggio: C5 - E5 - G5
+                    [523.25, 659.25, 783.99].forEach((freq, idx) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        const startTime = now + (idx * 0.1);
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, startTime);
+                        gain.gain.setValueAtTime(0.2, startTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.25);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start(startTime);
+                        osc.stop(startTime + 0.25);
+                    });
+                } else if (type === 'wrong') {
+                    // Gentle low buzz
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.linearRampToValueAtTime(150, now + 0.25);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'win') {
+                    // Grand fanfare
+                    [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        const startTime = now + (idx * 0.12);
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(freq, startTime);
+                        gain.gain.setValueAtTime(0.25, startTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.4);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start(startTime);
+                        osc.stop(startTime + 0.4);
+                    });
+                } else if (type === 'step') {
+                    // Mechanical step sound for robot
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(320, now);
+                    osc.frequency.exponentialRampToValueAtTime(160, now + 0.1);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                }
+            } catch (err) {
+                console.warn('Audio synthesis note:', err);
+            }
+        }
+
+        function toggleAudio() {
+            isAudioMuted = !isAudioMuted;
+            const icon = document.getElementById('soundIcon');
+            if (isAudioMuted) {
+                icon.className = 'fa-solid fa-volume-xmark text-rose-600';
+                showToast('🔇 ปิดเสียงแล้ว');
+            } else {
+                icon.className = 'fa-solid fa-volume-high text-sky-800';
+                playSound('click');
+                showToast('🔊 เปิดเสียงแล้ว');
+            }
+        }
+
+        // Global State
+        const state = {
+            stars: 0,
+            currentLessonIdx: 0,
+            levelProgress: {
+                lvl1: false,
+                lvl2: false,
+                lvl3: false,
+                lvl4: false
+            },
+            // Level 1 state
+            l1CurrentQ: 0,
+            l1Score: 0,
+            // Level 2 state
+            l2CurrentRound: 0,
+            l2SelectedSequence: [],
+            // Level 3 state
+            l3CurrentQ: 0,
+            // Level 4 state
+            robotPos: { r: 0, c: 0 },
+            commands: [],
+            trashCollected: false,
+            isRobotRunning: false
+        };
+
+        function addStar(amount = 1) {
+            state.stars += amount;
+            document.getElementById('starCounter').innerText = state.stars;
+            document.getElementById('summaryStarCount').innerText = state.stars;
+        }
+
+        function navTo(screenName) {
+            playSound('click');
+            const screens = document.querySelectorAll('.screen-view');
+            screens.forEach(s => s.classList.add('hidden'));
+
+            const target = document.getElementById('screen-' + screenName);
+            if (target) {
+                target.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            updateGameHubBadges();
+        }
+
+        let toastTimeout = null;
+        function showToast(message, icon = '💡') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastIcon').innerText = icon;
+            document.getElementById('toastMessage').innerText = message;
+            
+            toast.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-10');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('opacity-0', 'pointer-events-none', '-translate-y-10');
+                toast.classList.remove('opacity-100', 'translate-y-0');
+            }, 2400);
+        }
+
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 70,
+                    spread: 60,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+
+        const lessonsData = [
+            {
+                title: 'บทที่ 1: ปัญหาคืออะไร? 🤔',
+                badge: 'เข้าใจความหมาย',
+                emoji: '🌧️',
+                text: '<strong>"ปัญหา"</strong> คือ เหตุการณ์หรือเรื่องราวที่ทำให้เรา <em>ไม่สะดวก สบาย ลำบาก หรืออาจเกิดอันตรายได้</em>',
+                exampleTitle: 'ลองดูตัวอย่างปัญหาใกล้ตัวเราสิ:',
+                examples: [
+                    { icon: '🌧️', title: 'ฝนตกหนัก', desc: 'ทำให้เราเปียกและเดินกลับบ้านลำบาก' },
+                    { icon: '👟', title: 'เชือกรองเท้าหลุด', desc: 'อาจสะดุดล้มและเจ็บตัวได้' },
+                    { icon: '✏️', title: 'ดินสอหัก', desc: 'ทำให้เขียนหนังสือต่อไม่ได้' }
+                ],
+                interactiveHint: '👉 เมื่อเจอปัญหา สิ่งแรกที่ต้องทำคือ <strong>ตั้งสติ และมองหาว่าปัญหาคืออะไร</strong>'
+            },
+            {
+                title: 'บทที่ 2: 3 ขั้นตอนการแก้ปัญหา 🛠️',
+                badge: 'เรียนรู้วิธีการ',
+                emoji: '🪜',
+                text: 'การแก้ปัญหาจะง่ายและไม่สับสน ถ้าเราทำตาม <strong>3 ขั้นตอนหลัก</strong> นี้:',
+                steps: [
+                    { step: '1', title: 'มองหาปัญหา 🔍', desc: 'สังเกตและทำความเข้าใจว่า ปัญหาที่เกิดขึ้นคืออะไรกันแน่' },
+                    { step: '2', title: 'วางแผนแก้ปัญหา 📝', desc: 'คิดหาวิธีแก้ เลือกเครื่องมือ หรือเรียงลำดับสิ่งที่ต้องทำ' },
+                    { step: '3', title: 'ลงมือทำและตรวจทาน ✅', desc: 'ทำตามแผนที่วางไว้ แล้วดูว่าปัญหาคลี่คลายเรียบร้อยดีไหม' }
+                ],
+                interactiveHint: '💡 ถ้าทำครบ 3 ขั้นตอนนี้ เราจะแก้ได้ทุกปัญหาแน่นอน!'
+            },
+            {
+                title: 'บทที่ 3: การเรียงลำดับขั้นตอน (Algorithm) 🐾',
+                badge: 'ทักษะอัลกอริทึม',
+                emoji: '🪥',
+                text: '<strong>"อัลกอริทึม"</strong> ฟังดูชื่อยาก แต่จริง ๆ คือ <em>การทำสิ่งต่าง ๆ ตามลำดับก่อน-หลัง</em> ทีละขั้น เพื่อไม่ให้สับสน',
+                exampleTitle: 'ตัวอย่าง: ขั้นตอนการแปรงฟันให้สะอาด 🫧',
+                stepsSeq: [
+                    { no: '1', text: 'บีบยาสีฟันใส่แปรง 🪥' },
+                    { no: '2', text: 'แปรงฟันให้ทั่วทุกซี่ 🦷' },
+                    { no: '3', text: 'บ้วนปากด้วยน้ำสะอาด 💧' }
+                ],
+                interactiveHint: '⚠️ หากเราสลับขั้น เช่น "บ้วนปากก่อนแปรงฟัน" ฟันก็อาจจะไม่สะอาดนะ!'
+            }
+        ];
+
+        function startLessons() {
+            state.currentLessonIdx = 0;
+            renderLesson();
+            navTo('lessons');
+        }
+
+        function renderLesson() {
+            const data = lessonsData[state.currentLessonIdx];
+            const container = document.getElementById('lessonContentContainer');
+
+            // Update Progress Dots & Badges
+            for (let i = 0; i < 3; i++) {
+                const dot = document.getElementById(`lessonDot${i}`);
+                if (i === state.currentLessonIdx) {
+                    dot.className = 'w-5 h-3 rounded-full bg-sky-500 transition-all';
+                } else if (i < state.currentLessonIdx) {
+                    dot.className = 'w-3 h-3 rounded-full bg-emerald-400 transition-all';
+                } else {
+                    dot.className = 'w-3 h-3 rounded-full bg-slate-200 transition-all';
+                }
+            }
+            document.getElementById('lessonIndexBadge').innerText = `บทที่ ${state.currentLessonIdx + 1} / 3`;
+            document.getElementById('lessonPrevBtn').disabled = (state.currentLessonIdx === 0);
+
+            const nextBtn = document.getElementById('lessonNextBtn');
+            if (state.currentLessonIdx === lessonsData.length - 1) {
+                nextBtn.innerHTML = `<span>ไปลุยเกมกันเลย! 🎮</span>`;
+                nextBtn.className = "bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-6 py-2.5 rounded-xl shadow-md transition active:scale-95 flex items-center gap-2";
+            } else {
+                nextBtn.innerHTML = `<span>ถัดไป</span> <i class="fa-solid fa-chevron-right"></i>`;
+                nextBtn.className = "bg-sky-500 hover:bg-sky-600 text-white font-bold px-6 py-2.5 rounded-xl shadow-md transition active:scale-95 flex items-center gap-2";
+            }
+
+            // Render Dynamic Body
+            let bodyHTML = `
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">${data.emoji}</span>
+                        <div>
+                            <span class="text-xs bg-sky-100 text-sky-800 font-bold px-2 py-0.5 rounded-full">${data.badge}</span>
+                            <h2 class="text-xl sm:text-2xl font-black text-slate-800">${data.title}</h2>
+                        </div>
+                    </div>
+                    <p class="text-slate-700 text-base sm:text-lg leading-relaxed">${data.text}</p>
+            `;
+
+            if (data.examples) {
+                bodyHTML += `<h4 class="font-bold text-slate-800 text-sm mt-2">${data.exampleTitle}</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">`;
+                data.examples.forEach(ex => {
+                    bodyHTML += `
+                        <div class="bg-sky-50 border border-sky-200 p-3 rounded-2xl flex sm:flex-col items-center sm:text-center gap-3">
+                            <span class="text-3xl">${ex.icon}</span>
+                            <div>
+                                <h5 class="font-bold text-slate-800 text-sm">${ex.title}</h5>
+                                <p class="text-xs text-slate-600">${ex.desc}</p>
+                            </div>
+                        </div>`;
+                });
+                bodyHTML += `</div>`;
+            }
+
+            if (data.steps) {
+                bodyHTML += `<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 my-2">`;
+                data.steps.forEach(st => {
+                    bodyHTML += `
+                        <div class="bg-amber-50 border-2 border-amber-200 p-4 rounded-2xl">
+                            <span class="w-8 h-8 rounded-full bg-amber-400 text-amber-950 font-black inline-flex items-center justify-center text-sm mb-2">${st.step}</span>
+                            <h5 class="font-bold text-slate-800 text-base mb-1">${st.title}</h5>
+                            <p class="text-xs text-slate-600">${st.desc}</p>
+                        </div>`;
+                });
+                bodyHTML += `</div>`;
+            }
+
+            if (data.stepsSeq) {
+                bodyHTML += `<div class="bg-indigo-50 border border-indigo-200 p-4 rounded-2xl space-y-2">
+                    <h5 class="font-bold text-indigo-900 text-sm">${data.exampleTitle}</h5>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">`;
+                data.stepsSeq.forEach(seq => {
+                    bodyHTML += `
+                        <div class="bg-white p-3 rounded-xl border border-indigo-200 flex items-center gap-2 shadow-sm font-semibold text-slate-700 text-sm">
+                            <span class="bg-indigo-600 text-white w-6 h-6 rounded-full text-xs flex items-center justify-center font-bold">${seq.no}</span>
+                            <span>${seq.text}</span>
+                        </div>`;
+                });
+                bodyHTML += `</div></div>`;
+            }
+
+            bodyHTML += `
+                <div class="bg-slate-100 p-3 rounded-xl text-slate-700 text-xs sm:text-sm font-medium border-l-4 border-amber-400">
+                    ${data.interactiveHint}
+                </div>
+            </div>`;
+
+            container.innerHTML = bodyHTML;
+        }
+
+        function prevLesson() {
+            playSound('click');
+            if (state.currentLessonIdx > 0) {
+                state.currentLessonIdx--;
+                renderLesson();
+            }
+        }
+
+        function nextLesson() {
+            playSound('click');
+            if (state.currentLessonIdx < lessonsData.length - 1) {
+                state.currentLessonIdx++;
+                renderLesson();
+            } else {
+                // Completed all lessons, give bonus star and redirect to game
+                addStar(1);
+                showToast('🎉 เก่งมาก! ได้รับ 1 ดาวจากการเรียนรู้', '⭐');
+                playSound('correct');
+                triggerConfetti();
+                startGamesHub();
+            }
+        }
+
+        function startGamesHub() {
+            updateGameHubBadges();
+            navTo('games-hub');
+        }
+
+        function updateGameHubBadges() {
+            const levels = ['lvl1', 'lvl2', 'lvl3', 'lvl4'];
+            levels.forEach((lvl, idx) => {
+                const el = document.getElementById(`${lvl}Badge`);
+                if (el) {
+                    if (state.levelProgress[lvl]) {
+                        el.innerText = '✅ ผ่านแล้ว';
+                        el.className = 'text-xs text-emerald-600 font-bold';
+                    } else {
+                        el.innerText = 'ยังไม่ผ่าน';
+                        el.className = 'text-xs text-slate-400 font-bold';
+                    }
+                }
+            });
+
+            // Check if all 4 completed
+            const allPassed = levels.every(k => state.levelProgress[k]);
+            if (allPassed && state.stars >= 4) {
+                // Summary screen available
+            }
+        }
+
+        function startLevel(lvlNum) {
+            playSound('click');
+            if (lvlNum === 1) initLevel1();
+            if (lvlNum === 2) initLevel2();
+            if (lvlNum === 3) initLevel3();
+            if (lvlNum === 4) initLevel4();
+            navTo(`game-${lvlNum}`);
+        }
+
+        const l1Questions = [
+            {
+                emoji: '🌧️🎒',
+                title: 'น้องส้มกำลังจะเดินกลับบ้าน แต่ฝนตกลงมาอย่างหนัก!',
+                options: [
+                    { text: '🌧️ ฝนตกหนักจนทำให้เปียกและกลับบ้านไม่ได้', isCorrect: true },
+                    { text: '🎒 กระเป๋านักเรียนมีสีสวยงาม', isCorrect: false },
+                    { text: '🏡 บ้านของน้องส้มอยู่ไม่ไกล', isCorrect: false }
+                ]
+            },
+            {
+                emoji: '👟⚠️',
+                title: 'น้องภูริกำลังวิ่งเล่นในสนาม แต่เชือกรองเท้าหลุดยาวลากพื้น!',
+                options: [
+                    { text: '🏃 สนามหญ้ามีพื้นที่กว้างขวาง', isCorrect: false },
+                    { text: '👟 เชือกรองเท้าหลุด อาจเหยียบสะดุดหกล้ม', isCorrect: true },
+                    { text: '👟 รองเท้าคู่นี้วิ่งเร็วมาก', isCorrect: false }
+                ]
+            },
+            {
+                emoji: '✏️📝',
+                title: 'น้องมะลิจะวาดรูปส่งคุณครู แต่หยิบดินสอขึ้นมาพบว่าไส้หักหมด!',
+                options: [
+                    { text: '📄 กระดาษวาดรูปแผ่นใหญ่สะอาดดี', isCorrect: false },
+                    { text: '🎨 สีไม้ในกล่องเรียงกันสวย', isCorrect: false },
+                    { text: '✏️ ไส้ดินสอหัก ทำให้วาดรูปต่อไม่ได้', isCorrect: true }
+                ]
+            }
+        ];
+
+        function initLevel1() {
+            state.l1CurrentQ = 0;
+            state.l1Score = 0;
+            renderLevel1Q();
+        }
+
+        function renderLevel1Q() {
+            const q = l1Questions[state.l1CurrentQ];
+            document.getElementById('l1QuestionNum').innerText = (state.l1CurrentQ + 1);
+            document.getElementById('l1ScenarioEmoji').innerText = q.emoji;
+            document.getElementById('l1ScenarioTitle').innerText = q.title;
+
+            const container = document.getElementById('l1OptionsContainer');
+            container.innerHTML = '';
+
+            // Shuffle options slightly
+            const shuffled = [...q.options].sort(() => Math.random() - 0.5);
+            shuffled.forEach((opt) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left bg-white hover:bg-amber-100 border-2 border-slate-200 hover:border-amber-400 p-4 rounded-2xl font-bold text-slate-800 transition transform active:scale-98 shadow-sm flex items-center gap-3";
+                btn.innerHTML = `<span class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 text-sm">❓</span> <span class="text-base">${opt.text}</span>`;
+                btn.onclick = () => checkLevel1Answer(opt.isCorrect, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkLevel1Answer(isCorrect, btn) {
+            if (isCorrect) {
+                playSound('correct');
+                btn.classList.remove('bg-white', 'border-slate-200');
+                btn.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-900');
+                showToast('เก่งมาก! นั่นคือปัญหาที่แท้จริง 👏', '✨');
+                state.l1Score++;
+
+                setTimeout(() => {
+                    if (state.l1CurrentQ < l1Questions.length - 1) {
+                        state.l1CurrentQ++;
+                        renderLevel1Q();
+                    } else {
+                        // Completed Level 1
+                        state.levelProgress.lvl1 = true;
+                        addStar(1);
+                        playSound('win');
+                        triggerConfetti();
+                        showToast('🎉 ยินดีด้วย! ผ่านด่านที่ 1 ได้รับ 1 ดาว ⭐', '⭐');
+                        setTimeout(() => startGamesHub(), 1500);
+                    }
+                }, 800);
+            } else {
+                playSound('wrong');
+                btn.classList.add('bg-rose-100', 'border-rose-400', 'animate-wiggle');
+                showToast('ข้อนี้ยังไม่ใช่ปัญหานะ ลองคิดดูใหม่อีกที! 🤔', '❌');
+                setTimeout(() => {
+                    btn.classList.remove('bg-rose-100', 'border-rose-400', 'animate-wiggle');
+                }, 700);
+            }
+        }
+
+        const l2Rounds = [
+            {
+                title: 'ภารกิจ: เรียงลำดับขั้นตอน "การแปรงฟัน" 🪥',
+                correctOrder: ['บีบยาสีฟันใส่แปรง', 'แปรงฟันให้ทั่วทุกซี่', 'บ้วนปากด้วยน้ำสะอาด'],
+                steps: [
+                    { id: 'บ้วนปากด้วยน้ำสะอาด', icon: '💧', text: 'บ้วนปากด้วยน้ำสะอาด' },
+                    { id: 'บีบยาสีฟันใส่แปรง', icon: '🪥', text: 'บีบยาสีฟันใส่แปรง' },
+                    { id: 'แปรงฟันให้ทั่วทุกซี่', icon: '🦷', text: 'แปรงฟันให้ทั่วทุกซี่' }
+                ]
+            },
+            {
+                title: 'ภารกิจ: เรียงลำดับขั้นตอน "การล้างมือ 7 ขั้นตอน" 🧼',
+                correctOrder: ['เปิดน้ำชโลมมือให้เปียก', 'ถูสบู่ฟอกให้ทั่วฝ่ามือ', 'ล้างน้ำสะอาดและเช็ดให้แห้ง'],
+                steps: [
+                    { id: 'ล้างน้ำสะอาดและเช็ดให้แห้ง', icon: '🧻', text: 'ล้างน้ำสะอาดและเช็ดให้แห้ง' },
+                    { id: 'เปิดน้ำชโลมมือให้เปียก', icon: '🚰', text: 'เปิดน้ำชโลมมือให้เปียก' },
+                    { id: 'ถูสบู่ฟอกให้ทั่วฝ่ามือ', icon: '🧼', text: 'ถูสบู่ฟอกให้ทั่วฝ่ามือ' }
+                ]
+            }
+        ];
+
+        function initLevel2() {
+            state.l2CurrentRound = 0;
+            resetL2();
+        }
+
+        function resetL2() {
+            state.l2SelectedSequence = [];
+            for (let i = 1; i <= 3; i++) {
+                const slot = document.getElementById(`slot${i}`);
+                slot.querySelector('.slot-content').innerText = 'ว่าง';
+                slot.className = 'border-3 border-dashed border-sky-300 bg-sky-50 rounded-2xl p-3 sm:p-4 text-center min-h-[110px] flex flex-col justify-center items-center transition';
+            }
+            renderL2Options();
+        }
+
+        function renderL2Options() {
+            const roundData = l2Rounds[state.l2CurrentRound];
+            document.getElementById('l2Title').innerText = roundData.title;
+            const container = document.getElementById('l2OptionsList');
+            container.innerHTML = '';
+
+            roundData.steps.forEach(step => {
+                const isSelected = state.l2SelectedSequence.includes(step.id);
+                const btn = document.createElement('button');
+                btn.disabled = isSelected;
+                btn.className = `p-4 rounded-2xl border-2 font-bold text-sm sm:text-base flex flex-col items-center justify-center gap-2 transition active:scale-95 ${
+                    isSelected ? 'bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed' : 'bg-white hover:bg-sky-50 border-sky-200 hover:border-sky-400 text-slate-800 shadow-sm'
+                }`;
+                btn.innerHTML = `<span class="text-3xl">${step.icon}</span> <span>${step.text}</span>`;
+                btn.onclick = () => selectL2Step(step.id, step.text, step.icon);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectL2Step(stepId, text, icon) {
+            playSound('click');
+            const nextSlotIdx = state.l2SelectedSequence.length + 1;
+            state.l2SelectedSequence.push(stepId);
+
+            // Fill Slot visual
+            const slot = document.getElementById(`slot${nextSlotIdx}`);
+            slot.querySelector('.slot-content').innerHTML = `<span class="text-xl">${icon}</span> <div class="mt-1">${text}</div>`;
+            slot.className = 'border-3 border-solid border-sky-400 bg-white rounded-2xl p-3 sm:p-4 text-center min-h-[110px] flex flex-col justify-center items-center shadow-md animate-pop-in';
+
+            renderL2Options();
+
+            // When all 3 slots filled, check logic
+            if (state.l2SelectedSequence.length === 3) {
+                const currentRound = l2Rounds[state.l2CurrentRound];
+                const isCorrect = state.l2SelectedSequence.every((val, index) => val === currentRound.correctOrder[index]);
+
+                if (isCorrect) {
+                    playSound('correct');
+                    for (let i = 1; i <= 3; i++) {
+                        document.getElementById(`slot${i}`).className = 'border-3 border-emerald-400 bg-emerald-50 rounded-2xl p-3 sm:p-4 text-center min-h-[110px] flex flex-col justify-center items-center';
+                    }
+                    showToast('🎉 ถูกต้องแล้ว! เรียงลำดับอัลกอริทึมได้เป๊ะมาก', '✨');
+
+                    setTimeout(() => {
+                        if (state.l2CurrentRound < l2Rounds.length - 1) {
+                            state.l2CurrentRound++;
+                            resetL2();
+                        } else {
+                            state.levelProgress.lvl2 = true;
+                            addStar(1);
+                            playSound('win');
+                            triggerConfetti();
+                            showToast('🎉 ผ่านด่านที่ 2 ได้รับ 1 ดาว ⭐', '⭐');
+                            setTimeout(() => startGamesHub(), 1500);
+                        }
+                    }, 1000);
+                } else {
+                    playSound('wrong');
+                    for (let i = 1; i <= 3; i++) {
+                        document.getElementById(`slot${i}`).classList.add('border-rose-400', 'bg-rose-50', 'animate-wiggle');
+                    }
+                    showToast('ลำดับยังไม่ถูกต้องจ้า... ลองดูใหม่อีกรอบนะ!', '❌');
+                    setTimeout(() => {
+                        resetL2();
+                    }, 1200);
+                }
+            }
+        }
+
+        const l3Questions = [
+            {
+                emoji: '🥤💧',
+                title: 'มีน้ำหวานหกเลอะเทอะเต็มพื้นห้อง!',
+                questionText: 'เราควรเลือกใช้เครื่องมือใดแก้ปัญหานี้ให้พื้นแห้งสะอาด?',
+                options: [
+                    { icon: '🧹', title: 'ไม้กวาดดอกหญ้า', desc: 'เอาไว้กวาดฝุ่นแห้ง', isCorrect: false },
+                    { icon: '🧽', title: 'ผ้าเช็ดพื้น / ไม้ถูพื้น', desc: 'ซับน้ำให้แห้งสะอาดได้ดีเยี่ยม', isCorrect: true },
+                    { icon: '✂️', title: 'กรรไกรตัดกระดาษ', desc: 'เอาไว้ตัดสิ่งของ', isCorrect: false }
+                ]
+            },
+            {
+                emoji: '🌧️🚶',
+                title: 'ฝนตกลงมา และเราจำเป็นต้องเดินข้ามไปอีกตึกหนึ่ง!',
+                questionText: 'อุปกรณ์ใดช่วยแก้ปัญหาไม่ให้เราเปียกฝน?',
+                options: [
+                    { icon: '☂️', title: 'ร่มชูชีพหรือร่มกันฝน', desc: 'กางเพื่อกันละอองน้ำฝน', isCorrect: true },
+                    { icon: '👓', title: 'แว่นตากันแดด', desc: 'เอาไว้กรองแสงแดดจ้า', isCorrect: false },
+                    { icon: '🧤', title: 'ถุงมือกันหนาว', desc: 'เอาไว้ให้ความอบอุ่นแก่มือ', isCorrect: false }
+                ]
+            },
+            {
+                emoji: '📄✂️',
+                title: 'มีเศษกระดาษชิ้นเล็กๆ ตกเกลื่อนเต็มใต้โต๊ะเรียน!',
+                questionText: 'เครื่องมือใดเหมาะสมที่สุดในการทำความสะอาดเศษกระดาษแห้ง?',
+                options: [
+                    { icon: '🪣', title: 'ถังน้ำเปล่า', desc: 'ไม่มีอุปกรณ์กวาด', isCorrect: false },
+                    { icon: '🧹', title: 'ไม้กวาดและที่ตักผง', desc: 'กวาดรวมแล้วตักไปทิ้งถังขยะ', isCorrect: true },
+                    { icon: '📏', title: 'ไม้บรรทัด', desc: 'เอาไว้วัดความยาว', isCorrect: false }
+                ]
+            }
+        ];
+
+        function initLevel3() {
+            state.l3CurrentQ = 0;
+            renderLevel3Q();
+        }
+
+        function renderLevel3Q() {
+            const q = l3Questions[state.l3CurrentQ];
+            document.getElementById('l3QuestionNum').innerText = (state.l3CurrentQ + 1);
+            document.getElementById('l3ScenarioEmoji').innerText = q.emoji;
+            document.getElementById('l3ScenarioTitle').innerText = q.title;
+
+            const container = document.getElementById('l3OptionsContainer');
+            container.innerHTML = '';
+
+            q.options.forEach((opt) => {
+                const card = document.createElement('button');
+                card.className = "bg-white hover:bg-emerald-50 border-3 border-slate-200 hover:border-emerald-400 p-5 rounded-2xl text-center transition transform active:scale-95 shadow-sm flex flex-col items-center justify-between";
+                card.innerHTML = `
+                    <div class="text-5xl mb-2">${opt.icon}</div>
+                    <div class="font-extrabold text-slate-800 text-lg">${opt.title}</div>
+                    <div class="text-xs text-slate-500 mt-1">${opt.desc}</div>
+                `;
+                card.onclick = () => checkLevel3Answer(opt.isCorrect, card);
+                container.appendChild(card);
+            });
+        }
+
+        function checkLevel3Answer(isCorrect, card) {
+            if (isCorrect) {
+                playSound('correct');
+                card.className = "bg-emerald-100 border-3 border-emerald-500 p-5 rounded-2xl text-center shadow-lg transform scale-102 transition";
+                showToast('เลือกอุปกรณ์ได้ถูกต้องและเหมาะสมมาก! 🌟', '✅');
+
+                setTimeout(() => {
+                    if (state.l3CurrentQ < l3Questions.length - 1) {
+                        state.l3CurrentQ++;
+                        renderLevel3Q();
+                    } else {
+                        state.levelProgress.lvl3 = true;
+                        addStar(1);
+                        playSound('win');
+                        triggerConfetti();
+                        showToast('🎉 ผ่านด่านที่ 3 ได้รับ 1 ดาว ⭐', '⭐');
+                        setTimeout(() => startGamesHub(), 1500);
+                    }
+                }, 900);
+            } else {
+                playSound('wrong');
+                card.classList.add('bg-rose-50', 'border-rose-400', 'animate-wiggle');
+                showToast('เครื่องมือนี้ยังไม่เหมาะกับปัญหานี้นะ ลองเลือกใหม่อีกครั้ง! 🤔', '❌');
+                setTimeout(() => {
+                    card.classList.remove('bg-rose-50', 'border-rose-400', 'animate-wiggle');
+                }, 800);
+            }
+        }
+
+        // Grid setup: 3x3
+        // Start: (0,0) -> Trash: (1,1) -> Bin: (2,2)
+        const GRID_ROWS = 3;
+        const GRID_COLS = 3;
+        const START_POS = { r: 0, c: 0 };
+        const TRASH_POS = { r: 1, c: 1 };
+        const BIN_POS = { r: 2, c: 2 };
+
+        function initLevel4() {
+            state.robotPos = { ...START_POS };
+            state.commands = [];
+            state.trashCollected = false;
+            state.isRobotRunning = false;
+            renderRobotGrid();
+            renderCommandStack();
+        }
+
+        function renderRobotGrid() {
+            const gridContainer = document.getElementById('robotGrid');
+            gridContainer.innerHTML = '';
+
+            for (let r = 0; r < GRID_ROWS; r++) {
+                for (let c = 0; c < GRID_COLS; c++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'relative bg-white rounded-2xl border-2 border-purple-200 flex items-center justify-center text-3xl shadow-sm transition-all duration-300';
+                    
+                    const isRobotHere = (state.robotPos.r === r && state.robotPos.c === c);
+                    const isTrashHere = (!state.trashCollected && TRASH_POS.r === r && TRASH_POS.c === c);
+                    const isBinHere = (BIN_POS.r === r && BIN_POS.c === c);
+
+                    if (isBinHere) {
+                        cell.classList.add('bg-amber-50', 'border-amber-300');
+                        cell.innerHTML = `<span class="opacity-90">🗑️</span>`;
+                    } else if (isTrashHere) {
+                        cell.classList.add('bg-rose-50', 'border-rose-200');
+                        cell.innerHTML = `<span class="opacity-90">🧃</span>`;
+                    }
+
+                    if (isRobotHere) {
+                        cell.classList.add('bg-purple-100', 'border-purple-500', 'ring-4', 'ring-purple-200');
+                        if (state.trashCollected) {
+                            cell.innerHTML = `<div class="relative flex items-center justify-center"><span class="animate-bounce-gentle">🤖</span><span class="absolute -top-2 -right-2 text-base">🧃</span></div>`;
+                        } else {
+                            cell.innerHTML = `<span class="animate-bounce-gentle">🤖</span>`;
+                        }
+                    }
+
+                    gridContainer.appendChild(cell);
+                }
+            }
+        }
+
+        function addRobotCommand(dir) {
+            if (state.isRobotRunning) return;
+            if (state.commands.length >= 6) {
+                showToast('ใส่คำสั่งได้สูงสุด 6 คำสั่งนะเด็กๆ 😊', '⚠️');
+                return;
+            }
+            playSound('click');
+            state.commands.push(dir);
+            renderCommandStack();
+        }
+
+        function clearRobotCommands() {
+            if (state.isRobotRunning) return;
+            playSound('click');
+            state.commands = [];
+            state.robotPos = { ...START_POS };
+            state.trashCollected = false;
+            renderCommandStack();
+            renderRobotGrid();
+        }
+
+        function renderCommandStack() {
+            const container = document.getElementById('commandStackContainer');
+            if (state.commands.length === 0) {
+                container.innerHTML = `<span class="text-xs text-slate-400 italic px-2">ยังไม่มีคำสั่ง (กดปุ่มลูกศรด้านล่าง)</span>`;
+                return;
+            }
+
+            const arrowMap = {
+                'UP': '⬆️',
+                'DOWN': '⬇️',
+                'LEFT': '⬅️',
+                'RIGHT': '➡️'
+            };
+
+            container.innerHTML = '';
+            state.commands.forEach((cmd, idx) => {
+                const badge = document.createElement('div');
+                badge.className = 'px-3 py-1.5 bg-purple-100 border border-purple-300 rounded-xl text-lg font-bold flex items-center justify-center animate-pop-in';
+                badge.innerText = arrowMap[cmd];
+                container.appendChild(badge);
+            });
+        }
+
+        async function runRobotProgram() {
+            if (state.isRobotRunning) return;
+            if (state.commands.length === 0) {
+                showToast('กรุณากดวางแผนคำสั่งลูกศรก่อนนะจ๊ะ!', '💡');
+                return;
+            }
+
+            state.isRobotRunning = true;
+            state.robotPos = { ...START_POS };
+            state.trashCollected = false;
+            renderRobotGrid();
+
+            const runBtn = document.getElementById('runRobotBtn');
+            runBtn.disabled = true;
+            runBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            let failed = false;
+
+            for (let i = 0; i < state.commands.length; i++) {
+                const cmd = state.commands[i];
+                await new Promise(res => setTimeout(res, 600));
+
+                if (cmd === 'UP') state.robotPos.r--;
+                if (cmd === 'DOWN') state.robotPos.r++;
+                if (cmd === 'LEFT') state.robotPos.c--;
+                if (cmd === 'RIGHT') state.robotPos.c++;
+
+                playSound('step');
+
+                // Check out of bounds
+                if (state.robotPos.r < 0 || state.robotPos.r >= GRID_ROWS || state.robotPos.c < 0 || state.robotPos.c >= GRID_COLS) {
+                    failed = true;
+                    showToast('โอ๊ะโอ! หุ่นยนต์เดินชนขอบตารางกระดาน 💥', '⚠️');
+                    playSound('wrong');
+                    break;
+                }
+
+                // Check pickup trash
+                if (state.robotPos.r === TRASH_POS.r && state.robotPos.c === TRASH_POS.c) {
+                    if (!state.trashCollected) {
+                        state.trashCollected = true;
+                        playSound('click');
+                        showToast('หุ่นยนต์เก็บกล่องนมเปรี้ยวแล้ว! 🧃', '✨');
+                    }
+                }
+
+                renderRobotGrid();
+            }
+
+            await new Promise(res => setTimeout(res, 400));
+            runBtn.disabled = false;
+            runBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            state.isRobotRunning = false;
+
+            if (failed) {
+                setTimeout(() => {
+                    state.robotPos = { ...START_POS };
+                    state.trashCollected = false;
+                    renderRobotGrid();
+                }, 1000);
+                return;
+            }
+
+            // Check goal condition: Robot at Bin AND trashCollected is true
+            const isAtBin = (state.robotPos.r === BIN_POS.r && state.robotPos.c === BIN_POS.c);
+
+            if (isAtBin && state.trashCollected) {
+                playSound('win');
+                triggerConfetti();
+                state.levelProgress.lvl4 = true;
+                addStar(1);
+                showToast('🎉 สำเร็จ! พาหุ่นยนต์เก็บขยะลงถังได้เรียบร้อย', '🏆');
+
+                setTimeout(() => {
+                    // Check if all levels completed to show Certificate screen
+                    navTo('summary');
+                }, 1800);
+            } else if (isAtBin && !state.trashCollected) {
+                playSound('wrong');
+                showToast('หุ่นยนต์ถึงถังขยะแล้ว แต่ลืมแวะไปเก็บกล่องนม 🧃 นะจ๊ะ!', '🤔');
+            } else {
+                playSound('wrong');
+                showToast('ยังไปไม่ถึงถังขยะ 🗑️ เลย ลองวางแผนเส้นทางใหม่นะ!', '❓');
+            }
+        }
+
+        function generateCertificate() {
+            playSound('click');
+            const nameInput = document.getElementById('studentNameInput').value.trim();
+            if (!nameInput) {
+                showToast('กรุณากรอกชื่อ-นามสกุลก่อนนะจ๊ะเด็กๆ ✍️', '⚠️');
+                return;
+            }
+
+            document.getElementById('certStudentName').innerText = nameInput;
+            document.getElementById('certificateCard').classList.remove('hidden');
+            document.getElementById('certificateCard').classList.add('animate-pop-in');
+            document.getElementById('printCertBtn').classList.remove('hidden');
+            document.getElementById('certInputBox').classList.add('hidden');
+            
+            playSound('win');
+            triggerConfetti();
+            showToast('สร้างเกียรติบัตรสำเร็จ ยอดเยี่ยมมาก! 🏆', '✨');
+        }
+
+        function printCertificate() {
+            playSound('click');
+            window.print();
+        }
+
+        function resetWholeApp() {
+            playSound('click');
+            state.stars = 0;
+            state.currentLessonIdx = 0;
+            state.levelProgress = { lvl1: false, lvl2: false, lvl3: false, lvl4: false };
+            document.getElementById('starCounter').innerText = '0';
+            document.getElementById('studentNameInput').value = '';
+            document.getElementById('certificateCard').classList.add('hidden');
+            document.getElementById('certInputBox').classList.remove('hidden');
+            document.getElementById('printCertBtn').classList.add('hidden');
+            navTo('home');
+            showToast('เริ่มการผจญภัยรอบใหม่ สนุกไปด้วยกันนะ! 🚀', '🌈');
+        }
+
+        // Initialize application on page load
+        window.addEventListener('load', () => {
+            renderLesson();
+            updateGameHubBadges();
+        });
+    </script>
+</body>
+</html>
